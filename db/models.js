@@ -4,9 +4,10 @@ const mongoose = require("mongoose");
 require('dotenv').config();
 
 // Access environment variables
-const databaseUrl = process.env.MONGO_URL;
+// const databaseUrl = process.env.MONGO_URL;
+const { DATABASE_URL } = require("../config");
 
-mongoose.connect(databaseUrl)
+mongoose.connect(DATABASE_URL)
 
 const signupSchema = mongoose.Schema({
     email: {

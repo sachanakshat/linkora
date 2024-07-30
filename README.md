@@ -41,6 +41,14 @@ With Linkora, you no longer need to ask for letters of recommendation or endorse
 4. Start the application:
    ```bash
    npm run dev
+> [!NOTE]  
+> The server is configured to run Next backend by default. However as per developer requests, and equivalent express server is also created at server/index.js for better code distribution. Please use branch backend-express and port 3001 for the same.
+
+Run express server using:
+   ``` bash
+   node server/index.js
+   ```
+
 ### Usage
 1. Open your browser and navigate to [localhost](http://localhost:3000)
 2. Create an account or log in if you already have one.
