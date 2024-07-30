@@ -26,8 +26,15 @@ const signupSchema = mongoose.Schema({
     password: String
 })
 
+const signinSchema = mongoose.Schema({
+    email: String,
+    password: String
+})
+
 const signupModel = mongoose.model('signup', signupSchema);
+const signinModel = mongoose.model('signin', signinSchema);
 
 module.exports = {
-    signupModelMongo:signupModel
+    signupModelMongo:signupModel,
+    signinModelMongo:signinModel
 }
