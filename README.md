@@ -22,6 +22,15 @@ Linkora can help you find people with similar interests. Whether for professiona
 ### **Eliminate the Need for Endorsements**
 With Linkora, you no longer need to ask for letters of recommendation or endorsements. All the information you need is publicly available on the platform, making the process seamless and efficient.
 
+##### Built with:
+- NextJS 14
+- TailwindCSS
+- Prisma ORM
+- Zod
+- Typescript
+- Express.js
+- Node.js
+
 ## Getting Started
 
 ### Prerequisites

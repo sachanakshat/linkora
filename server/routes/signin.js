@@ -2,7 +2,7 @@ const express = require("express");
 
 const router = express.Router();
 
-const { signinModelMongo, signupModelMongo } = require("../../db/models");
+const { signupModelMongo } = require("../../db/models");
 const { signinParser } = require("../../db/types");
 const { JWT_SECRET } = require("../../config");
 const jwt = require("jsonwebtoken");
