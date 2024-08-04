@@ -30,33 +30,101 @@ const { userModelMongo } = require("../../db/userModel");
 const router = express.Router();
 
 router.post("/", async (req, res) => {
-    // const { success } = userParser.safeParse(req.body);
-    // if (!success) {
-    //     return res.status(411).json({
-    //         message: "Please check your inputs. Refer doc for input guidelines",
-    //     });
-    // }
+    const { success } = userParser.safeParse(req.body);
+    if (!success) {
+        return res.status(411).json({
+            message: "Please check your inputs. Refer doc for input guidelines",
+        });
+    }
     try {
         const username = req.body.username;
         const userId =
             username.replace(/\s/g, "") + Math.floor(Math.random() * 100000);
-        const socials = req.body.socials;
-        const feedback = req.body.feedback;
-        console.log("-----PRINTING THE SOCIALS-----")
-        console.log(typeof(socials.linkedin))
-        console.log(socials.linkedin)
+        const socials = {};
+        for (let key in req.body.socials) {
+            if (req.body.socials[key]) {
+                socials[key] = [{ link: req.body.socials[key], count: 1 }];
+            }
+
+            // console.log(socials[key]);
+        }
+        const feedback = [req.body.feedback];
+
+        // Check if any social handle matches an existing record
+        const socialKeys = Object.keys(req.body.socials);
+        let existingUser = null;
+
+        for (let key of socialKeys) {
+            const searchCriteria = {};
+            searchCriteria[`socials.${key}.link`] = req.body.socials[key];
+
+            existingUser = await userModelMongo.findOne(searchCriteria);
+
+            if (existingUser) break;
+        }
+
+        if (existingUser) {
+            // Update existing user record
+            const updates = {};
+            for (let key in req.body.socials) {
+                const socialLink = req.body.socials[key];
+                if (!socialLink) continue; // Skip empty social links
+                
+                const socialRecord = existingUser.socials[key].find(
+                    (s) => s.link === socialLink
+                );
+
+                if (socialRecord) {
+                    socialRecord.count += 1;
+                } else {
+                    existingUser.socials[key].push({
+                        link: socialLink,
+                        count: 1,
+                    });
+                }
+            }
+
+            existingUser.feedbacks.push(req.body.feedback);
+
+            existingUser.username = username;
+
+            await existingUser.save();
+
+            res.status(200).json({
+                message: "User updated successfully",
+                user: existingUser,
+            });
+            return;
+        } else {
+            // Create a new user record
+            const userId =
+                username.replace(/\s/g, "") +
+                Math.floor(Math.random() * 100000);
+
+            const newUser = await userModelMongo.create({
+                userId: userId,
+                username: username,
+                socials: socials,
+                feedbacks: feedback,
+            });
+
+            res.status(201).json({
+                message: "User created successfully",
+                user: newUser,
+            });
+        }
 
         // If new entry, create a new record
-        const user = await userModelMongo.create({
-            userId: userId,
-            username: username,
-            socials: socials,
-            feedback: feedback,
-        });
+        // const user = await userModelMongo.create({
+        //     userId: userId,
+        //     username: username,
+        //     socials: socials,
+        //     feedbacks: feedback,
+        // });
 
-        res.status(201).json({
-            message: "User created successfully"
-        })
+        // res.status(201).json({
+        //     message: "User created successfully"
+        // })
 
         // If already present, append the information in the arrays
         // Cases- Any of the socials matches
@@ -66,7 +134,7 @@ router.post("/", async (req, res) => {
         res.status(500).json({
             msg: "Internal server error",
         });
-        console.log("Exception at createReview" + error);
+        console.log("Exception at createReview: " + error);
     }
 });
 
