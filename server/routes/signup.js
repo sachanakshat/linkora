@@ -2,13 +2,14 @@ const express = require("express");
 
 const router = express.Router();
 
-const { signupModelMongo } = require("../../db/models");
-const { signupParser } = require("../../db/types");
+const { signupModelMongo } = require("../../db/signupsModel");
+const { signupParser } = require("../../db/signupsTypes");
 const { JWT_SECRET } = require("../../config");
 const jwt = require("jsonwebtoken");
 
 router.post("/", async (req, res) => {
   const parsedPayload = signupParser.safeParse(req.body);
+  console.log(parsedPayload);
 
   if (!parsedPayload.success) {
     return res.status(411).json({

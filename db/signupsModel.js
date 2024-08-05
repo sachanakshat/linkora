@@ -24,6 +24,10 @@ const signupSchema = mongoose.Schema({
         required: [true, "Email required"],
     },
     password: String,
+    verified: {
+        type: Boolean,
+        default: false
+    }
 });
 
 const signupModel = mongoose.model("signup", signupSchema);
