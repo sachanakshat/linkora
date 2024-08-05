@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { signupModelMongo } from "@/db/models";
-import { signupParser } from "@/db/types";
+import { signupModelMongo } from "@/db/signupsModel";
+import { signupParser } from "@/db/signupsTypes";
 
 export async function POST(req: NextRequest) {
   const unparsedBody = await req.json();

@@ -1,4 +1,4 @@
-export function Login() {
+export default function Login():JSX.Element {
     return (
         // <div className="grid grid-cols-2">
         //     <div>
