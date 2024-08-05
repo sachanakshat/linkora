@@ -1,13 +1,15 @@
-// backend/routes/user.js
 const express = require("express");
 
 const router = express.Router();
 
-const { signupModelMongo } = require("../../db/models");
-const { signupParser } = require("../../db/types");
+const { signupModelMongo } = require("../../db/signupsModel");
+const { signupParser } = require("../../db/signupsTypes");
+const { JWT_SECRET } = require("../../config");
+const jwt = require("jsonwebtoken");
 
 router.post("/", async (req, res) => {
   const parsedPayload = signupParser.safeParse(req.body);
+  console.log(parsedPayload);
 
   if (!parsedPayload.success) {
     return res.status(411).json({
@@ -16,9 +18,22 @@ router.post("/", async (req, res) => {
   }
 
   try {
-    await signupModelMongo.create({
+    const user = await signupModelMongo.create({
       email: req.body.email,
       password: req.body.password,
+    });
+
+    const token = jwt.sign(
+      {
+        user,
+      },
+      JWT_SECRET
+    );
+
+    return res.status(200).json({
+      msg: "User created",
+      email: req.body.email,
+      token: token,
     });
   } catch (error) {
     if (error.code === 11000) {
@@ -32,16 +47,12 @@ router.post("/", async (req, res) => {
         message: error.errors.email.message || "Validation error",
       });
     } else {
+      console.log(error)
       return res.status(400).json({
         message: "Something is wrong at our servers, please try after sometime",
       });
     }
   }
-
-  return res.status(200).json({
-    msg: "User created",
-    email: req.body.email,
-  });
 });
 
 module.exports = router;
