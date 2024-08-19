@@ -154,7 +154,7 @@ export default function Login():JSX.Element {
         </div>
         <div className="w-full md:w-1/3 text-center">
             <p className="text-sm">
-                Don't have an account? <a href="#" className="text-blue-500">Sign up for free</a>
+                Don't have an account? <a href="/signup" className="text-blue-500">Sign up for free</a>
             </p>
         </div>
     </div>
