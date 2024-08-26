@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
         message: "Error in parsing the inputs",
       },
       {
-        status: 400,
+        status: 411,
       }
     );
   }
