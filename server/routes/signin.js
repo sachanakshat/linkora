@@ -9,6 +9,8 @@ const jwt = require("jsonwebtoken");
 
 router.post("/", async (req, res) => {
     const { success } = signinParser.safeParse(req.body);
+    console.log("Type of request body= ", typeof req.body);
+    console.log(req.body);
     if (!success) {
         return res.status(411).json({
             message: "Please provide inputs in correct format",
