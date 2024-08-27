@@ -118,7 +118,4 @@ const CreateReview: React.FC = () => {
     );
 };
 
-// module.exports = {
-//     CreateReview
-// };
 export default CreateReview;
