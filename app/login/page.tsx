@@ -1,3 +1,5 @@
+import { ModeToggle } from "@/components/ModeToggle"
+
 export default function Login():JSX.Element {
     return (
         // <div className="grid grid-cols-2">
@@ -152,6 +154,7 @@ export default function Login():JSX.Element {
             <button className="w-full py-2 bg-blue-500 text-white rounded-lg">Sign In</button>
             <button className="w-full py-2 bg-red-500 text-white rounded-lg">Sign in with Google</button>
         </div>
+        <ModeToggle/>
         <div className="w-full md:w-1/3 text-center">
             <p className="text-sm">
                 Don't have an account? <a href="/signup" className="text-blue-500">Sign up for free</a>

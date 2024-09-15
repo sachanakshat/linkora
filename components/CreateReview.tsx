@@ -3,6 +3,7 @@
 import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
+import { ModeToggle } from './ModeToggle';
 
 const CreateReview: React.FC = () => {
     const [username, setUsername] = useState<string>('');
@@ -113,7 +114,9 @@ const CreateReview: React.FC = () => {
                         Submit
                     </button>
                 </form>
+                
             </div>
+            <ModeToggle/>
         </div>
     );
 };
