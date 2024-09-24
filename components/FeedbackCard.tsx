@@ -4,10 +4,13 @@
  * Documentation: https://v0.dev/docs#integrating-generated-code-into-your-nextjs-app
  */
 import { Select, SelectTrigger, SelectContent, SelectItem } from "@/components/ui/select"
+import { UserFeedback } from '@/app/api/v1/getReviews/route';
+import { use } from "react";
 
-export default function FeedbackCard() {
+export default function FeedbackCard({userId, username, feedback}: UserFeedback) {
   return (
-    <div className="w-full max-w-md bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden mx-auto">
+    // w-full max-w-md
+    <div className=" bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden m-2">
       <div className="flex justify-between items-center px-6 py-4">
         <div className="flex space-x-4">
           <div>
@@ -21,8 +24,8 @@ export default function FeedbackCard() {
             />
           </div>
           <div>
-            <div className="text-lg font-bold dark:text-white">John Doe</div>
-            <div className="text-sm text-gray-500 dark:text-gray-200">@johndoe</div>
+            <div className="text-lg font-bold dark:text-white">{username}</div>
+            <div className="text-sm text-gray-500 dark:text-gray-200">@{userId}</div>
           </div>
         </div>
         <div>
@@ -53,8 +56,10 @@ export default function FeedbackCard() {
       </div>
       <div className="px-6 py-4">
         <div className="text-sm text-gray-800 dark:text-gray-200">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas pellentesque id erat at blandit. Donec
-          ullamcorper turpis vitae dolor lacinia mollis. Donec at augue eget ipsum porttitor interdum.
+          {/* Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas pellentesque id erat at blandit. Donec
+          ullamcorper turpis vitae dolor lacinia mollis. Donec at augue eget ipsum porttitor interdum. */}
+          {feedback}
+          {/* The most savage abnormally hilarious person you will ever meet */}
         </div>
       </div>
       <div className="flex justify-between items-center space-x-4 pt-4 border-t border-gray-200 dark:border-gray-700 p-4">
