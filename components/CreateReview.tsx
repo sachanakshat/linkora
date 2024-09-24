@@ -1,124 +1,169 @@
 'use client'
+import React, { useState } from 'react';
 
-import { useState, FormEvent } from 'react';
-import { useRouter } from 'next/navigation';
-import axios from 'axios';
-import { ModeToggle } from './ModeToggle';
+interface SocialLinks {
+  linkedin: string;
+  facebook: string;
+  twitter: string;
+  email: string;
+  phone: string;
+  moreLinks: string;
+}
+
+interface ReviewInput {
+  username: string;
+  socials: SocialLinks;
+  feedback: string;
+}
 
 const CreateReview: React.FC = () => {
-    const [username, setUsername] = useState<string>('');
-    const [socials, setSocials] = useState<{ [key: string]: string }>({});
-    const [feedback, setFeedback] = useState<string>('');
-    const [error, setError] = useState<string>('');
-    const router = useRouter();
+  const [formData, setFormData] = useState<ReviewInput>({
+    username: '',
+    socials: {
+      linkedin: '',
+      facebook: '',
+      twitter: '',
+      email: '',
+      phone: '',
+      moreLinks: '',
+    },
+    feedback: '',
+  });
 
-    const handleSocialChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setSocials((prevSocials) => ({ ...prevSocials, [name]: value }));
-    };
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
 
-    const handleSubmit = async (e: FormEvent) => {
-        e.preventDefault();
-        try {
-            const response = await axios.post('http://localhost:3001/api/v1/signup', {
-                username: username,
-                socials: socials,
-                feedback: feedback,
-            }, {
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
+    if (name in formData.socials) {
+      setFormData({
+        ...formData,
+        socials: {
+          ...formData.socials,
+          [name]: value,
+        },
+      });
+    } else {
+      setFormData({
+        ...formData,
+        [name]: value,
+      });
+    }
+  };
 
-            if (response.status === 200 || response.status === 201) {
-                router.push('/homepage/page');
-            }
-        } catch (err) {
-            setError('Submission failed. Please try again.');
-        }
-    };
+  const hasAtLeastOneSocial = () => {
+    return Object.values(formData.socials).some((link) => link.trim() !== '');
+  };
 
-    return (
-        <div className="min-h-screen bg-cover bg-center flex items-center justify-center" style={{ backgroundImage: "url('https://source.unsplash.com/random/1920x1080?nature')" }}>
-            <div className="bg-white bg-opacity-80 p-8 rounded-lg shadow-lg w-full max-w-lg">
-                <h1 className="text-3xl font-serif mb-4 text-center">Create Review</h1>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    <div>
-                        <label className="block text-sm font-bold mb-2">Username</label>
-                        <input
-                            className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            type="text"
-                            placeholder="Enter your username"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
-                            required
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-bold mb-2">Social Links</label>
-                        <input
-                            className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            type="text"
-                            name="linkedin"
-                            placeholder="LinkedIn URL"
-                            onChange={handleSocialChange}
-                        />
-                        <input
-                            className="w-full px-3 py-2 mt-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            type="text"
-                            name="facebook"
-                            placeholder="Facebook URL"
-                            onChange={handleSocialChange}
-                        />
-                        <input
-                            className="w-full px-3 py-2 mt-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            type="text"
-                            name="twitter"
-                            placeholder="Twitter URL"
-                            onChange={handleSocialChange}
-                        />
-                        <input
-                            className="w-full px-3 py-2 mt-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            type="text"
-                            name="email"
-                            placeholder="Email"
-                            onChange={handleSocialChange}
-                        />
-                        <input
-                            className="w-full px-3 py-2 mt-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            type="text"
-                            name="phone"
-                            placeholder="Phone Number"
-                            onChange={handleSocialChange}
-                        />
-                        <input
-                            className="w-full px-3 py-2 mt-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            type="text"
-                            name="moreLinks"
-                            placeholder="Other Links"
-                            onChange={handleSocialChange}
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-bold mb-2">Feedback</label>
-                        <textarea
-                            className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            placeholder="Enter your feedback"
-                            value={feedback}
-                            onChange={(e) => setFeedback(e.target.value)}
-                            required
-                        />
-                    </div>
-                    {error && <p className="text-red-500">{error}</p>}
-                    <button className="w-full py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50" type="submit">
-                        Submit
-                    </button>
-                </form>
-                
-            </div>
-            <ModeToggle/>
-        </div>
-    );
+  const handleSubmit = async () => {
+    if (!hasAtLeastOneSocial()) {
+      alert('Please provide at least one social link.');
+      return;
+    }
+
+    if (formData.feedback.trim() === '') {
+      alert('Please provide feedback.');
+      return;
+    }
+
+    try {
+      const response = await fetch('http://localhost:3001/api/v1/createReview', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (response.ok) {
+        alert('Review submitted successfully!');
+        // Optionally, clear the form after submission
+        setFormData({
+          username: '',
+          socials: {
+            linkedin: '',
+            facebook: '',
+            twitter: '',
+            email: '',
+            phone: '',
+            moreLinks: '',
+          },
+          feedback: '',
+        });
+      } else {
+        alert('Failed to submit the review. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error submitting review:', error);
+      alert('An error occurred while submitting the review.');
+    }
+  };
+
+  return (
+    <div className="max-w-lg mx-auto p-6 bg-white shadow-lg rounded-lg">
+      <h2 className="text-2xl font-bold text-center mb-4 text-gray-800">Create Review</h2>
+
+      {/* Username Input */}
+      <div className="mb-4">
+        <label className="block text-gray-700 mb-1" htmlFor="username">
+          Username
+        </label>
+        <input
+          type="text"
+          id="username"
+          name="username"
+          value={formData.username}
+          onChange={handleChange}
+          className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+          placeholder="Enter the user's name"
+          required
+        />
+      </div>
+
+      {/* Social Links Input */}
+      <div className="mb-4">
+        <label className="block text-gray-700 mb-1">Social Links (at least one is required)</label>
+
+        {['linkedin', 'facebook', 'twitter', 'email', 'phone', 'moreLinks'].map((social) => (
+          <div className="mb-2" key={social}>
+            <input
+              type="text"
+              name={social}
+              value={formData.socials[social as keyof SocialLinks]}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+              placeholder={`Enter ${social.charAt(0).toUpperCase() + social.slice(1)} URL`}
+            />
+          </div>
+        ))}
+      </div>
+
+      {/* Feedback Input */}
+      <div className="mb-4">
+        <label className="block text-gray-700 mb-1" htmlFor="feedback">
+          Feedback
+        </label>
+        <textarea
+          id="feedback"
+          name="feedback"
+          value={formData.feedback}
+          onChange={handleChange}
+          className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+          placeholder="Enter your feedback"
+          rows={4}
+          required
+        />
+      </div>
+
+      {/* Submit Button */}
+      <div className="text-center">
+        <button
+          onClick={handleSubmit}
+          className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+        >
+          Submit Review
+        </button>
+      </div>
+    </div>
+  );
 };
 
 export default CreateReview;
