@@ -128,6 +128,15 @@ export function NavigationMenuDemo() {
                         </NavigationMenuLink>
                     </Link>
                 </NavigationMenuItem>
+                <NavigationMenuItem>
+                    <Link href="/createReview" legacyBehavior passHref>
+                        <NavigationMenuLink
+                            className={navigationMenuTriggerStyle()}
+                        >
+                            Give Feedback
+                        </NavigationMenuLink>
+                    </Link>
+                </NavigationMenuItem>
             </NavigationMenuList>
         </NavigationMenu>
     );
