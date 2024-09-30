@@ -40,14 +40,14 @@ const CreateReview: React.FC = () => {
     return (
         <div className="min-h-screen bg-cover bg-center flex items-center justify-center" style={{ backgroundImage: "url('https://source.unsplash.com/random/1920x1080?nature')" }}>
             <div className="bg-white bg-opacity-80 p-8 rounded-lg shadow-lg w-full max-w-lg">
-                <h1 className="text-3xl font-serif mb-4 text-center">Create Review</h1>
+                <h1 className="text-3xl font-serif mb-4 text-center">Give Feedback</h1>
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
-                        <label className="block text-sm font-bold mb-2">Username</label>
+                        <label className="block text-sm font-bold mb-2">Name</label>
                         <input
                             className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                             type="text"
-                            placeholder="Enter your username"
+                            placeholder="John Doe"
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
                             required

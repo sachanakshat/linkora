@@ -1,5 +1,6 @@
 import React from 'react';
 import UserProfileCard from '@/components/UserProfileCard';
+import ListAllUsersComponent from '@/components/ListAllUsersComponent';
 
 const Page: React.FC = () => {
   const userData = {
@@ -81,10 +82,11 @@ const Page: React.FC = () => {
   };
 
   return (
+    <ListAllUsersComponent/>
     // bg-gray-100
-    <div className="min-h-screen  flex items-center justify-center">
-      <UserProfileCard user={userData} />
-    </div>
+    // <div className="min-h-screen  flex items-center justify-center">
+    //   <UserProfileCard user={userData} />
+    // </div>
   );
 };
 

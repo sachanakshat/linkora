@@ -4,6 +4,8 @@ import CreateReview from "./createReview/page"
 import LandingComponent from "@/components/LandingComponent";
 import FeedbackCard from "@/components/FeedbackCard";
 import AllFeedbacks from "@/components/AllFeedbacks";
+import LandingPageFramer from "@/components/LandingPageFramer";
+import LandingPage from "@/components/LandingPageTailwind";
 
 export default function Home() {
   return (
@@ -12,6 +14,8 @@ export default function Home() {
     // <SignupPage/>
     // <CreateReview/>
     // <FeedbackCard userId="sachanakshat" username="Akshat Sachan" feedback="Hello World"/>
-    <AllFeedbacks/>
+    // <AllFeedbacks/>
+    // <LandingPageFramer/>
+    <LandingPage/>
   );
 }
