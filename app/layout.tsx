@@ -39,7 +39,7 @@ export default function RootLayout({
                     disableTransitionOnChange
                 >
                     <div className="flex items-center justify-between p-4 border-b">
-                        <a className="text-3xl font-semibold tracking-tight">
+                        <a className="hidden sm:block sm:text-3xl sm:font-semibold sm:tracking-tight">
                             LINKORA
                         </a>
                         {/* <NavigationMenu>
