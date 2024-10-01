@@ -59,7 +59,7 @@ export function NavigationMenuDemo() {
     return (
         <NavigationMenu>
             <NavigationMenuList>
-                <NavigationMenuItem>
+                {/* <NavigationMenuItem>
                     <NavigationMenuTrigger>
                         Getting started
                     </NavigationMenuTrigger>
@@ -118,8 +118,8 @@ export function NavigationMenuDemo() {
                             ))}
                         </ul>
                     </NavigationMenuContent>
-                </NavigationMenuItem>
-                <NavigationMenuItem>
+                </NavigationMenuItem> */}
+                <NavigationMenuItem className="hidden sm:block">
                     <Link href="/directory" legacyBehavior passHref>
                         <NavigationMenuLink
                             className={navigationMenuTriggerStyle()}
