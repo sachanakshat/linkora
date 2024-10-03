@@ -2,8 +2,6 @@
 
 import Image from "next/image";
 import { MoreHorizontal } from "lucide-react";
-
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
     Card,
@@ -14,13 +12,6 @@ import {
     CardTitle,
 } from "@/components/ui/card";
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
     Table,
     TableBody,
     TableCell,
@@ -28,18 +19,36 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-
-import { UserFeedback } from "@/app/api/v1/getReviews/route";
 import { useEffect, useState } from "react";
-import axios, { Axios, AxiosResponse } from "axios";
+import axios, { AxiosResponse } from "axios";
+import { FaFacebook, FaTwitter, FaLinkedin, FaEnvelope, FaPhone } from 'react-icons/fa'; // Importing icons from react-icons
+import { Dropdown } from "@/components/ui/dropdown"; // Assuming you have a Dropdown component
+
+// Define the interface for UserFeedback and SocialLink
+export interface SocialLink {
+    link: string;
+    count: number;
+}
+
+export interface UserFeedback {
+    userId: string;
+    username: string;
+    feedback: string;
+    socials?: {
+        linkedin?: SocialLink[];
+        twitter?: SocialLink[];
+        email?: SocialLink[];
+        phone?: SocialLink[];
+        facebook?: SocialLink[];
+    };
+}
 
 export default function ListAllUsersComponent() {
     const [fetchedData, setData] = useState<UserFeedback[]>([]);
 
+    // Fetch data from the API
     useEffect(() => {
-        let data: any = JSON.stringify({
-            type: "all",
-        });
+        let data = JSON.stringify({ type: "all" });
         let config = {
             method: "post",
             maxBodyLength: Infinity,
@@ -52,374 +61,96 @@ export default function ListAllUsersComponent() {
 
         axios
             .request(config)
-            .then((response: AxiosResponse<UserFeedback[]>) => {
-                // data = JSON.stringify(response.data);
-                data = response.data;
-                setData(data.data);
-                console.log(data);
+            .then((response: AxiosResponse<{ data: UserFeedback[] }>) => {
+                setData(response.data.data); // Set the fetched data
             })
             .catch((error: any) => {
-                console.log(error);
+                console.error(error);
             });
     }, []);
+
+    // Helper function to display social links with icons
+    const renderSocialLinks = (socials: UserFeedback["socials"]) => {
+        if (!socials) return null;
+
+        const getHighestCountLink = (links: SocialLink[]) => {
+            return links.reduce((prev, current) => (prev.count > current.count ? prev : current), links[0]);
+        };
+
+        // Collect all links in a single dropdown
+        const allLinks: SocialLink[] = [];
+
+        const highestLinks = {
+            linkedin: socials.linkedin ? getHighestCountLink(socials.linkedin) : null,
+            twitter: socials.twitter ? getHighestCountLink(socials.twitter) : null,
+            email: socials.email ? getHighestCountLink(socials.email) : null,
+            phone: socials.phone ? getHighestCountLink(socials.phone) : null,
+            facebook: socials.facebook ? getHighestCountLink(socials.facebook) : null,
+        };
+
+        // Push highest links to the dropdown
+        Object.values(highestLinks).forEach(link => {
+            if (link) {
+                allLinks.push(link);
+            }
+        });
+
+        // Collect remaining links for the dropdown
+        Object.entries(socials).forEach(([key, links]) => {
+            if (Array.isArray(links)) {
+                const highestLink = getHighestCountLink(links);
+                const otherLinks = links.filter(link => link.link !== highestLink.link);
+                allLinks.push(...otherLinks);
+            }
+        });
+
+        return (
+            <div className="flex flex-col">
+                {Object.values(highestLinks).map((link, index) =>
+                    link ? (
+                        <a key={index} href={link.link} target="_blank" rel="noopener noreferrer" className="flex items-center text-blue-600 hover:underline mb-1">
+                            {link.link}
+                        </a>
+                    ) : null
+                )}
+                {allLinks.length > 0 && (
+                    <Dropdown links={allLinks} />
+                )}
+            </div>
+        );
+    };
 
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Products</CardTitle>
+                <CardTitle>User Feedbacks</CardTitle>
                 <CardDescription>
-                    Manage your products and view their sales performance.
+                    View feedback and social profiles of users.
                 </CardDescription>
             </CardHeader>
             <CardContent>
                 <Table>
                     <TableHeader>
                         <TableRow>
-                            <TableHead className="hidden w-[100px] sm:table-cell">
-                                <span className="sr-only">Image</span>
-                            </TableHead>
                             <TableHead>Name</TableHead>
-                            <TableHead>Social</TableHead>
-                            <TableHead className="hidden md:table-cell">
-                                Price
-                            </TableHead>
-                            <TableHead className="hidden md:table-cell">
-                                Total Sales
-                            </TableHead>
-                            <TableHead className="hidden md:table-cell">
-                                Created at
-                            </TableHead>
-                            <TableHead>
-                                <span className="sr-only">Actions</span>
-                            </TableHead>
+                            <TableHead>Feedback</TableHead>
+                            <TableHead>Social Links</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        <TableRow>
-                            <TableCell className="hidden sm:table-cell">
-                                <Image
-                                    alt="Product image"
-                                    className="aspect-square rounded-md object-cover"
-                                    height="64"
-                                    src="/placeholder.svg"
-                                    width="64"
-                                />
-                            </TableCell>
-                            <TableCell className="font-medium">
-                                Laser Lemonade Machine
-                            </TableCell>
-                            <TableCell>
-                                <Badge variant="outline">Draft</Badge>
-                            </TableCell>
-                            <TableCell className="hidden md:table-cell">
-                                $499.99
-                            </TableCell>
-                            <TableCell className="hidden md:table-cell">
-                                25
-                            </TableCell>
-                            <TableCell className="hidden md:table-cell">
-                                2023-07-12 10:42 AM
-                            </TableCell>
-                            <TableCell>
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button
-                                            aria-haspopup="true"
-                                            size="icon"
-                                            variant="ghost"
-                                        >
-                                            <MoreHorizontal className="h-4 w-4" />
-                                            <span className="sr-only">
-                                                Toggle menu
-                                            </span>
-                                        </Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="end">
-                                        <DropdownMenuLabel>
-                                            Actions
-                                        </DropdownMenuLabel>
-                                        <DropdownMenuItem>
-                                            Edit
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem>
-                                            Delete
-                                        </DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-                            </TableCell>
-                        </TableRow>
-                        <TableRow>
-                            <TableCell className="hidden sm:table-cell">
-                                <Image
-                                    alt="Product image"
-                                    className="aspect-square rounded-md object-cover"
-                                    height="64"
-                                    src="/placeholder.svg"
-                                    width="64"
-                                />
-                            </TableCell>
-                            <TableCell className="font-medium">
-                                Hypernova Headphones
-                            </TableCell>
-                            <TableCell>
-                                <Badge variant="outline">Active</Badge>
-                            </TableCell>
-                            <TableCell className="hidden md:table-cell">
-                                $129.99
-                            </TableCell>
-                            <TableCell className="hidden md:table-cell">
-                                100
-                            </TableCell>
-                            <TableCell className="hidden md:table-cell">
-                                2023-10-18 03:21 PM
-                            </TableCell>
-                            <TableCell>
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button
-                                            aria-haspopup="true"
-                                            size="icon"
-                                            variant="ghost"
-                                        >
-                                            <MoreHorizontal className="h-4 w-4" />
-                                            <span className="sr-only">
-                                                Toggle menu
-                                            </span>
-                                        </Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="end">
-                                        <DropdownMenuLabel>
-                                            Actions
-                                        </DropdownMenuLabel>
-                                        <DropdownMenuItem>
-                                            Edit
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem>
-                                            Delete
-                                        </DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-                            </TableCell>
-                        </TableRow>
-                        <TableRow>
-                            <TableCell className="hidden sm:table-cell">
-                                <Image
-                                    alt="Product image"
-                                    className="aspect-square rounded-md object-cover"
-                                    height="64"
-                                    src="/placeholder.svg"
-                                    width="64"
-                                />
-                            </TableCell>
-                            <TableCell className="font-medium">
-                                AeroGlow Desk Lamp
-                            </TableCell>
-                            <TableCell>
-                                <Badge variant="outline">Active</Badge>
-                            </TableCell>
-                            <TableCell className="hidden md:table-cell">
-                                $39.99
-                            </TableCell>
-                            <TableCell className="hidden md:table-cell">
-                                50
-                            </TableCell>
-                            <TableCell className="hidden md:table-cell">
-                                2023-11-29 08:15 AM
-                            </TableCell>
-                            <TableCell>
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button
-                                            aria-haspopup="true"
-                                            size="icon"
-                                            variant="ghost"
-                                        >
-                                            <MoreHorizontal className="h-4 w-4" />
-                                            <span className="sr-only">
-                                                Toggle menu
-                                            </span>
-                                        </Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="end">
-                                        <DropdownMenuLabel>
-                                            Actions
-                                        </DropdownMenuLabel>
-                                        <DropdownMenuItem>
-                                            Edit
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem>
-                                            Delete
-                                        </DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-                            </TableCell>
-                        </TableRow>
-                        <TableRow>
-                            <TableCell className="hidden sm:table-cell">
-                                <Image
-                                    alt="Product image"
-                                    className="aspect-square rounded-md object-cover"
-                                    height="64"
-                                    src="/placeholder.svg"
-                                    width="64"
-                                />
-                            </TableCell>
-                            <TableCell className="font-medium">
-                                TechTonic Energy Drink
-                            </TableCell>
-                            <TableCell>
-                                <Badge variant="secondary">Draft</Badge>
-                            </TableCell>
-                            <TableCell className="hidden md:table-cell">
-                                $2.99
-                            </TableCell>
-                            <TableCell className="hidden md:table-cell">
-                                0
-                            </TableCell>
-                            <TableCell className="hidden md:table-cell">
-                                2023-12-25 11:59 PM
-                            </TableCell>
-                            <TableCell>
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button
-                                            aria-haspopup="true"
-                                            size="icon"
-                                            variant="ghost"
-                                        >
-                                            <MoreHorizontal className="h-4 w-4" />
-                                            <span className="sr-only">
-                                                Toggle menu
-                                            </span>
-                                        </Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="end">
-                                        <DropdownMenuLabel>
-                                            Actions
-                                        </DropdownMenuLabel>
-                                        <DropdownMenuItem>
-                                            Edit
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem>
-                                            Delete
-                                        </DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-                            </TableCell>
-                        </TableRow>
-                        <TableRow>
-                            <TableCell className="hidden sm:table-cell">
-                                <Image
-                                    alt="Product image"
-                                    className="aspect-square rounded-md object-cover"
-                                    height="64"
-                                    src="/placeholder.svg"
-                                    width="64"
-                                />
-                            </TableCell>
-                            <TableCell className="font-medium">
-                                Gamer Gear Pro Controller
-                            </TableCell>
-                            <TableCell>
-                                <Badge variant="outline">Active</Badge>
-                            </TableCell>
-                            <TableCell className="hidden md:table-cell">
-                                $59.99
-                            </TableCell>
-                            <TableCell className="hidden md:table-cell">
-                                75
-                            </TableCell>
-                            <TableCell className="hidden md:table-cell">
-                                2024-01-01 12:00 AM
-                            </TableCell>
-                            <TableCell>
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button
-                                            aria-haspopup="true"
-                                            size="icon"
-                                            variant="ghost"
-                                        >
-                                            <MoreHorizontal className="h-4 w-4" />
-                                            <span className="sr-only">
-                                                Toggle menu
-                                            </span>
-                                        </Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="end">
-                                        <DropdownMenuLabel>
-                                            Actions
-                                        </DropdownMenuLabel>
-                                        <DropdownMenuItem>
-                                            Edit
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem>
-                                            Delete
-                                        </DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-                            </TableCell>
-                        </TableRow>
-                        <TableRow>
-                            <TableCell className="hidden sm:table-cell">
-                                <Image
-                                    alt="Product image"
-                                    className="aspect-square rounded-md object-cover"
-                                    height="64"
-                                    src="/placeholder.svg"
-                                    width="64"
-                                />
-                            </TableCell>
-                            <TableCell className="font-medium">
-                                Luminous VR Headset
-                            </TableCell>
-                            <TableCell>
-                                <Badge variant="outline">Active</Badge>
-                            </TableCell>
-                            <TableCell className="hidden md:table-cell">
-                                $199.99
-                            </TableCell>
-                            <TableCell className="hidden md:table-cell">
-                                30
-                            </TableCell>
-                            <TableCell className="hidden md:table-cell">
-                                2024-02-14 02:14 PM
-                            </TableCell>
-                            <TableCell>
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button
-                                            aria-haspopup="true"
-                                            size="icon"
-                                            variant="ghost"
-                                        >
-                                            <MoreHorizontal className="h-4 w-4" />
-                                            <span className="sr-only">
-                                                Toggle menu
-                                            </span>
-                                        </Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="end">
-                                        <DropdownMenuLabel>
-                                            Actions
-                                        </DropdownMenuLabel>
-                                        <DropdownMenuItem>
-                                            Edit
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem>
-                                            Delete
-                                        </DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-                            </TableCell>
-                        </TableRow>
+                        {fetchedData.map((user, index) => (
+                            <TableRow key={index}>
+                                <TableCell className="font-medium">{user.username}</TableCell>
+                                <TableCell>{user.feedback}</TableCell>
+                                <TableCell>{renderSocialLinks(user.socials)}</TableCell>
+                            </TableRow>
+                        ))}
                     </TableBody>
                 </Table>
             </CardContent>
             <CardFooter>
                 <div className="text-xs text-muted-foreground">
-                    Showing <strong>1-10</strong> of <strong>32</strong>{" "}
-                    products
+                    Showing <strong>{fetchedData.length}</strong> users
                 </div>
             </CardFooter>
         </Card>

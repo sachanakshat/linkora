@@ -5,59 +5,61 @@ export interface UserFeedback {
     userId: string;
     username: string;
     feedback: string;
+    socials?: {
+        linkedin?: SocialLink[];
+        twitter?: SocialLink[];
+        email?: SocialLink[];
+        phone?: SocialLink[];
+        moreLinks?: SocialLink[];
+        facebook?: SocialLink[];
+    };
 }
 
 interface SocialLink {
     link: string;
     count: number;
-  }
+}
 
 interface User {
     userId: string;
     username: string;
     socials: {
-      linkedin?: SocialLink[];
-      twitter?: SocialLink[];
-      email?: SocialLink[];
-      phone?: SocialLink[];
-      moreLinks?: SocialLink[];
-      facebook?: SocialLink[];
+        linkedin?: SocialLink[];
+        twitter?: SocialLink[];
+        email?: SocialLink[];
+        phone?: SocialLink[];
+        moreLinks?: SocialLink[];
+        facebook?: SocialLink[];
     };
     feedbacks: string[];
-  }
+}
 
 export async function POST(req: NextRequest) {
     const requestBody = await req.json();
-    // console.log("START OF MESSAGE");
-    // console.log(requestBody);
-    // console.log("END OF MESSAGE");
 
     if (requestBody.type === "all") {
+        let feedbacks: UserFeedback[] = [];
 
-        let feedbacks = [];
+        // Fetch all users
+        const existingUsers = await userModelMongo.find({});
 
-        const existingUser = await userModelMongo.find({});
-        for (let user of existingUser) {
-            let u: Partial<UserFeedback> = {};
-            u.username = user.username;
-            u.userId = user.userId;
-            // console.log(user);
+        // Process each user
+        for (let user of existingUsers) {
             for (let feedback of user.feedbacks) {
-                // console.log(feedback);
-                u.feedback = feedback;
-                feedbacks.push(u);
+                // Create an object for each feedback with the user's social links
+                feedbacks.push({
+                    username: user.username,
+                    userId: user.userId,
+                    feedback: feedback,
+                    socials: user.socials, // Include social links
+                });
             }
-            // console.log(user.feedbacks);
         }
-        // console.log(existingUser.feedbacks);
 
-        // userModelMongo.find({}).then((users:any) => {
-        //     console.log(users.feedbacks);
-        // });
-
+        // Return the response with feedbacks and social links
         return NextResponse.json(
             {
-                message: "Recieved all in response",
+                message: "Received all in response",
                 data: feedbacks,
             },
             {
@@ -68,7 +70,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(
         {
-            message: "Recieved something else",
+            message: "Received something else",
         },
         {
             status: 200,
