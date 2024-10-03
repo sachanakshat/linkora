@@ -34,6 +34,13 @@ interface User {
     feedbacks: string[];
 }
 
+// Adding CORS headers to the response
+const corsHeaders = {
+    'Access-Control-Allow-Origin': '*', // Allow all origins
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+};
+
 export async function POST(req: NextRequest) {
     const requestBody = await req.json();
 
@@ -64,6 +71,7 @@ export async function POST(req: NextRequest) {
             },
             {
                 status: 200,
+                headers: corsHeaders, // Add CORS headers
             }
         );
     }
@@ -74,6 +82,12 @@ export async function POST(req: NextRequest) {
         },
         {
             status: 200,
+            headers: corsHeaders, // Add CORS headers
         }
     );
+}
+
+// Handle the OPTIONS request for CORS preflight
+export async function OPTIONS() {
+    return NextResponse.json({}, { status: 200, headers: corsHeaders });
 }
