@@ -52,7 +52,7 @@ export default function ListAllUsersComponent() {
         let config = {
             method: "post",
             maxBodyLength: Infinity,
-            url: "http://localhost:3000/api/v1/getReviews",
+            url: "https://linkora.vercel.app:3000/api/v1/getReviews",
             headers: {
                 "Content-Type": "application/json",
             },
