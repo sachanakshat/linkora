@@ -119,7 +119,8 @@ export function NavigationMenuDemo() {
                         </ul>
                     </NavigationMenuContent>
                 </NavigationMenuItem> */}
-                <NavigationMenuItem className="hidden sm:block">
+                {/* className="hidden sm:block" */}
+                <NavigationMenuItem>
                     <Link href="/directory" legacyBehavior passHref>
                         <NavigationMenuLink
                             className={navigationMenuTriggerStyle()}
