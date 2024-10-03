@@ -16,21 +16,57 @@ const CreateReview: React.FC = () => {
         setSocials((prevSocials) => ({ ...prevSocials, [name]: value }));
     };
 
+    // const handleSubmit = async (e: FormEvent) => {
+    //     e.preventDefault();
+    //     try {
+    //         const response = await axios.post('http://localhost:3001/api/v1/signup', {
+    //             username: username,
+    //             socials: socials,
+    //             feedback: feedback,
+    //         }, {
+    //             headers: {
+    //                 'Content-Type': 'application/json'
+    //             }
+    //         });
+
+    //         if (response.status === 200 || response.status === 201) {
+    //             router.push('/homepage/page');
+    //         }
+    //     } catch (err) {
+    //         setError('Submission failed. Please try again.');
+    //     }
+    // };
+
+
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
         try {
-            const response = await axios.post('http://localhost:3001/api/v1/signup', {
-                username: username,
-                socials: socials,
-                feedback: feedback,
-            }, {
+            const response = await fetch('/api/v1/createReview', {
+                method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
-                }
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    username: username,
+                    socials: {
+                        linkedin: socials.linkedin || "",
+                        facebook: socials.facebook || "",
+                        twitter: socials.twitter || "",
+                        email: socials.email || "",
+                        phone: socials.phone || "",
+                        moreLinks: socials.moreLinks || ""
+                    },
+                    feedback: feedback,
+                }),
             });
-
-            if (response.status === 200 || response.status === 201) {
-                router.push('/homepage/page');
+     
+            if (response.ok) {
+                // If the response is 200 or 201, navigate to the homepage
+                router.push('/');
+            } else {
+                // Handle errors appropriately (e.g., show message if input validation fails)
+                const errorResponse = await response.json();
+                setError(errorResponse.message || 'Submission failed. Please try again.');
             }
         } catch (err) {
             setError('Submission failed. Please try again.');
